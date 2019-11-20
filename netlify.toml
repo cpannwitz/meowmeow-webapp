@@ -1,0 +1,15 @@
+# Un-Cache Service Worker file
+[[headers]]
+  for = "/service-worker.js"
+  [headers.values]
+    cache-control = "max-age=0,no-cache,no-store,must-revalidate"
+[[headers]]
+  for = "/firebase-messaging-sw.js"
+  [headers.values]
+    cache-control = "max-age=0,no-cache,no-store,must-revalidate"
+# The following redirect is intended for use with most SPAs that handle
+# routing internally.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

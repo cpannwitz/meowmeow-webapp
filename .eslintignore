@@ -1,0 +1,4 @@
+/src/assets/**/*
+*.spec.*
+*.stories.*
+*.module.css

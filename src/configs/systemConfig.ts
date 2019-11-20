@@ -1,0 +1,30 @@
+const {
+  NODE_ENV,
+  REACT_APP_VERSION,
+  REACT_APP_FIREBASE_APIKEY,
+  REACT_APP_FIREBASE_AUTHDOMAIN,
+  REACT_APP_FIREBASE_DATABASEURL,
+  REACT_APP_FIREBASE_PROJECTID,
+  REACT_APP_FIREBASE_STORAGEBUCKET,
+  REACT_APP_FIREBASE_MESSAGINGSENDERID,
+  REACT_APP_FIREBASE_APPID,
+} = process.env
+
+const isEnvDev = NODE_ENV === 'development' ? true : false
+const isEnvProd = NODE_ENV === 'production' ? true : false
+
+const systemConfig = {
+  isEnvDev,
+  isEnvProd,
+  version: REACT_APP_VERSION,
+  firebase: {
+    apiKey: REACT_APP_FIREBASE_APIKEY,
+    authDomain: REACT_APP_FIREBASE_AUTHDOMAIN,
+    databaseURL: REACT_APP_FIREBASE_DATABASEURL,
+    projectId: REACT_APP_FIREBASE_PROJECTID,
+    storageBucket: REACT_APP_FIREBASE_STORAGEBUCKET,
+    messagingSenderId: REACT_APP_FIREBASE_MESSAGINGSENDERID,
+    appId: REACT_APP_FIREBASE_APPID,
+  },
+}
+export default systemConfig
