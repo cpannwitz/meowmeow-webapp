@@ -13,3 +13,7 @@
   from = "/*"
   to = "/index.html"
   status = 200
+[[redirects]]
+  from = "https://meowcards.netlify.com/*"
+  to = "https://meowmeow.rocks/:splat"
+  status = 301
