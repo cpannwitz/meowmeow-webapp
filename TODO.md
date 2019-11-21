@@ -16,8 +16,8 @@
 FIXED
 - seven on seven is broken
 ??? number of cards on hand is broken
+??? host / guest -> userId broken
 BUGS
 - revanche on final screen is broken
-- host / guest -> userId broken
 - display of number is broken
 - rankings list is broken

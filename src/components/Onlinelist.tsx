@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { useCollectionDataOnce, useCollection } from 'react-firebase-hooks/firestore'
+import { useCollectionData, useCollection } from 'react-firebase-hooks/firestore'
 import { useToggleState } from '../services/hooks'
 import { onlineUsersCollection, rankedUsersCollection } from '../services/firebaseQueries'
 import { OnlineUser, UserStats } from '../types/typings'
@@ -28,7 +28,7 @@ const OnlineList = () => {
         .filter(doc => doc.uid !== user.uid)
     : []
 
-  const [rankedUsers, rankedUsersLoading] = useCollectionDataOnce<UserStats>(rankedUsersCollection)
+  const [rankedUsers, rankedUsersLoading] = useCollectionData<UserStats>(rankedUsersCollection)
 
   return (
     <Section>
@@ -70,7 +70,6 @@ const OnlineList = () => {
 
       {rankedUsers && showRankings && (
         <>
-          (
           {rankedUsersLoading ? (
             <XXX style={{ height: '100%', flex: '1 1 auto', display: 'flex' }}>
               <Container>
