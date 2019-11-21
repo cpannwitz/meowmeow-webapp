@@ -3,8 +3,9 @@ import firebase from 'firebase/app'
 import { CardObject } from '../types/typings'
 
 const { REACT_APP_API_URL = '' } = process.env
+console.log(`LOG | : REACT_APP_API_URL`, REACT_APP_API_URL)
 const api = ky.extend({
-  prefixUrl: REACT_APP_API_URL,
+  // prefixUrl: REACT_APP_API_URL,
   hooks: {
     beforeRequest: [
       async (request, options) => {
@@ -21,7 +22,7 @@ const api = ky.extend({
 export function initUser() {
   return new Promise((resolve, reject) => {
     api
-      .get('api/initUser')
+      .get(REACT_APP_API_URL + '/api/initUser')
       .json()
       .then(result => resolve(result))
       .catch(error => reject(error))
@@ -31,7 +32,7 @@ export function initUser() {
 export function startGame(gameId: string) {
   return new Promise((resolve, reject) => {
     api
-      .post('api/startGame', {
+      .post(REACT_APP_API_URL + '/api/startGame', {
         json: {
           gameId,
         },
@@ -45,7 +46,7 @@ export function startGame(gameId: string) {
 export function rejectGame(gameId: string) {
   return new Promise((resolve, reject) => {
     api
-      .post('api/rejectGame', {
+      .post(REACT_APP_API_URL + '/api/rejectGame', {
         json: { gameId },
       })
       .json()
@@ -57,7 +58,7 @@ export function rejectGame(gameId: string) {
 export function createGame(guestId: string) {
   return new Promise((resolve, reject) => {
     api
-      .post('api/createGame', {
+      .post(REACT_APP_API_URL + '/api/createGame', {
         json: { guestId },
       })
       .json()
@@ -69,7 +70,7 @@ export function createGame(guestId: string) {
 export function matchActionTakeSuspension(gameId: string) {
   return new Promise((resolve, reject) => {
     api
-      .post('api/matchAction/takeSuspension', {
+      .post(REACT_APP_API_URL + '/api/matchAction/takeSuspension', {
         json: { gameId },
       })
       .json()
@@ -81,7 +82,7 @@ export function matchActionTakeSuspension(gameId: string) {
 export function matchActionDraw(gameId: string, penalty?: number) {
   return new Promise((resolve, reject) => {
     api
-      .post('api/matchAction/draw', {
+      .post(REACT_APP_API_URL + '/api/matchAction/draw', {
         json: { gameId, penalty },
       })
       .json()
@@ -93,7 +94,7 @@ export function matchActionDraw(gameId: string, penalty?: number) {
 export function matchActionPut(gameId: string, card: CardObject, jackWish?: string) {
   return new Promise((resolve, reject) => {
     api
-      .post('api/matchAction/put', {
+      .post(REACT_APP_API_URL + '/api/matchAction/put', {
         json: { gameId, card, jackWish },
       })
       .json()
