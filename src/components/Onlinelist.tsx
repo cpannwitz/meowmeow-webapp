@@ -9,19 +9,23 @@ import LoadingSpinner from './LoadingSpinner'
 
 import OnlineListItem from './OnlinelistItem'
 import RankListItem from './RankListItem'
+import { useSession } from '../services/firebase'
 
 const OnlineList = () => {
+  const user = useSession() as firebase.User
   const [showRankings, toggleShowRankings] = useToggleState(false)
 
   const [onlineUsersRaw, onlineUsersLoading] = useCollection(onlineUsersCollection)
   const onlineUsers = onlineUsersRaw
-    ? onlineUsersRaw.docs.map(
-        doc =>
-          ({
-            ...doc.data(),
-            uid: doc.id,
-          } as OnlineUser)
-      )
+    ? onlineUsersRaw.docs
+        .map(
+          doc =>
+            ({
+              ...doc.data(),
+              uid: doc.id,
+            } as OnlineUser)
+        )
+        .filter(doc => doc.uid !== user.uid)
     : []
 
   const [rankedUsers, rankedUsersLoading] = useCollectionDataOnce<UserStats>(rankedUsersCollection)

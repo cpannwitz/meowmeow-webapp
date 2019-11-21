@@ -13,6 +13,7 @@ export function updateOnlineStatus() {
         ? firebase.database.ServerValue.TIMESTAMP
         : firebase.firestore.FieldValue.serverTimestamp(),
       displayName,
+      uid,
     })
 
     const userStatusDatabaseRef = firebase.database().ref('/status/' + uid)
@@ -33,9 +34,7 @@ export function updateOnlineStatus() {
           .set(resultState(false, true))
           .then(function() {
             userStatusDatabaseRef.set(resultState(true, true))
-
-            userStatusFirestoreRef.set(resultState(true, false))
-            return
+            return userStatusFirestoreRef.set(resultState(true, false))
           })
           .catch(error => console.error(error))
       })
