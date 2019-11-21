@@ -15,13 +15,16 @@ const Invitelist: React.FC = () => {
     inivitedGamesCollection(user ? user.uid : '')
   )
 
+  const filteredInvitedGames =
+    invitedGames && user ? invitedGames.filter(game => game.host.id !== user.uid) : undefined
+
   return (
     <Section>
       {!invitedGamesLoading ? (
         <Container>
-          {invitedGames && invitedGames.length > 0 ? (
+          {filteredInvitedGames && filteredInvitedGames.length > 0 ? (
             <StyledList>
-              {invitedGames.map(gameData => (
+              {filteredInvitedGames.map(gameData => (
                 <InvitelistItem key={gameData.gameId} gameData={gameData} />
               ))}
             </StyledList>

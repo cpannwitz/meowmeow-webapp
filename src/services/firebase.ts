@@ -9,11 +9,6 @@ import systemConfig from '../configs/systemConfig'
 
 firebase.initializeApp({ ...systemConfig.firebase })
 
-firebase.messaging().onMessage(payload => {
-  // TODO: better handling! Maybe show toast
-  console.log(`LOG | : Messagewas received: `, payload)
-})
-
 interface UserContext {
   user: firebase.User | null
 }

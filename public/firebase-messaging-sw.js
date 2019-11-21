@@ -6,16 +6,18 @@ firebase.initializeApp({
   messagingSenderId: '605594120970',
 })
 
-const messaging = firebase.messaging()
+let messaging = null
+if (firebase.messaging.isSupported()) {
+  messaging = firebase.messaging()
+  messaging.setBackgroundMessageHandler(function(payload) {
+    console.log('[firebase-messaging-sw.js] Received background message ', payload)
+    // Customize notification here
+    const notificationTitle = 'MeowMeow!'
+    const notificationOptions = {
+      body: payload.data.status,
+      icon: './assets/icon-192x192.png',
+    }
 
-messaging.setBackgroundMessageHandler(function(payload) {
-  console.log('[firebase-messaging-sw.js] Received background message ', payload)
-  // Customize notification here
-  const notificationTitle = 'MeowMeow!'
-  const notificationOptions = {
-    body: payload.data.status,
-    icon: './assets/icon-192x192.png',
-  }
-
-  return self.registration.showNotification(notificationTitle, notificationOptions)
-})
+    return self.registration.showNotification(notificationTitle, notificationOptions)
+  })
+}

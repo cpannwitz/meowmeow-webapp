@@ -1,40 +1,56 @@
 import firebase from 'firebase/app'
 
+let messaging: firebase.messaging.Messaging | null = null
+if (firebase.messaging.isSupported()) {
+  messaging = firebase.messaging()
+  messaging.onMessage(payload => {
+    // TODO: better handling! Maybe show toast
+    console.log(`LOG | : Messagewas received: `, payload)
+  })
+}
+
 export async function enablePushNotifications(userId: string) {
-  return new Promise((resolve, reject) => {
-    firebase
-      .messaging()
-      .requestPermission()
-      .then(async () => {
-        console.log('Notification permission granted.')
-        const token = await firebase.messaging().getToken()
-        if (token) {
-          await updateTokenInDB(userId, token)
-        } else {
-          // Show permission request.
-          console.log('No Instance ID token available. Request permission to generate one.')
-          // Show permission UI.
-        }
-        return resolve(true)
-      })
-      .catch(error => {
-        console.error('PushPermission not granted | Error: ', error)
-        return reject(error)
-      })
+  return new Promise<boolean>((resolve, reject) => {
+    if (!messaging) {
+      return reject(false)
+    } else {
+      messaging
+        .requestPermission()
+        .then(async () => {
+          console.log('Notification permission granted.')
+          const token = await firebase.messaging().getToken()
+          if (token) {
+            await updateTokenInDB(userId, token)
+          } else {
+            // Show permission request.
+            console.log('No Instance ID token available. Request permission to generate one.')
+            // Show permission UI.
+          }
+          return resolve(true)
+        })
+        .catch(error => {
+          console.error('PushPermission not granted | Error: ', error)
+          return reject(error)
+        })
+    }
   })
 }
 
 export function disablePushNotifications(userId: string) {
   return new Promise<boolean>(async (resolve, reject) => {
-    const token = await firebase.messaging().getToken()
-    if (token) {
-      await firebase.messaging().deleteToken(token)
+    if (!messaging) {
+      return reject(false)
+    } else {
+      const token = await messaging.getToken()
+      if (token) {
+        await messaging.deleteToken(token)
+      }
+      await firebase
+        .database()
+        .ref('tokens/' + userId)
+        .remove()
+      resolve(true)
     }
-    await firebase
-      .database()
-      .ref('tokens/' + userId)
-      .remove()
-    resolve(true)
   })
 }
 

@@ -11,3 +11,13 @@
 - monorepo (https://github.com/biernacki/cra-monorepo)
 - reactions feature
 - computer game
+
+
+FIXED
+- seven on seven is broken
+??? number of cards on hand is broken
+BUGS
+- revanche on final screen is broken
+- host / guest -> userId broken
+- display of number is broken
+- rankings list is broken
