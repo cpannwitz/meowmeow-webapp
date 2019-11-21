@@ -52,7 +52,7 @@ const MatchlistItem: React.FC<MatchlistItemProps> = ({ gameData }: MatchlistItem
                 alt="arrow-icon"
               />
             )}
-            {user.uid === gameData.guest.id ? gameData.guestName : gameData.hostName}
+            {user.uid === gameData.guest.id ? gameData.hostName : gameData.guestName}
           </b>
         </Truncated>
 
