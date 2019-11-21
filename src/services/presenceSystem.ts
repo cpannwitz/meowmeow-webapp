@@ -9,9 +9,7 @@ export function updateOnlineStatus() {
 
     const resultState = (online: boolean, db: boolean) => ({
       state: online ? 'online' : 'offline',
-      lastChanged: db
-        ? firebase.database.ServerValue.TIMESTAMP
-        : firebase.firestore.FieldValue.serverTimestamp(),
+      lastChanged: db ? firebase.database.ServerValue.TIMESTAMP : new Date().toISOString(),
       displayName,
       uid,
     })
