@@ -17,18 +17,11 @@ import {
 } from '../StyleComponents'
 import AuthButton from './AuthButton'
 import { useToggleState } from '../services/hooks'
-import AuthInput from './AuthInput'
-// import { useHistory } from 'react-router'
-// import { useSession } from '../services/firebase'
+// import AuthInput from './AuthInput'
 
 const Home = () => {
-  // const history = useHistory()
   const [viewSwitched, toggleViewSwitched] = useToggleState(false)
-  // const user = useSession()
 
-  // if (user) {
-  //   history.push('/dashboard')
-  // }
   return (
     <Fullscreen>
       <FullscreenHeader>
@@ -62,13 +55,13 @@ const Home = () => {
           </FilterLink>
         </FilterBar>
 
-        <Container column>
+        {/* <Container column>
           {!viewSwitched ? (
             <AuthInput variant="signin" label="Login" />
           ) : (
             <AuthInput variant="signup" label="SignUp" />
           )}
-        </Container>
+        </Container> */}
       </Section>
     </Fullscreen>
   )
