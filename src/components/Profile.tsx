@@ -40,10 +40,13 @@ const Profile: React.FC = () => {
 
   function handleProfileSave() {
     if ((newUsername || newPhotoURL) && user) {
-      user.updateProfile({
-        displayName: newUsername,
-        photoURL: newPhotoURL,
-      })
+      user
+        .updateProfile({
+          displayName: newUsername,
+          photoURL: newPhotoURL,
+        })
+        .then(() => toggleIsEditing())
+        .catch(e => {})
     }
   }
 
