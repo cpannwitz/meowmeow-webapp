@@ -1,3 +1,9 @@
+Build Status
+
+[![Netlify Status](https://api.netlify.com/api/v1/badges/11ea2777-9a08-4eb7-8a9c-d69cc87be98d/deploy-status)](https://app.netlify.com/sites/meowcards/deploys)
+
+---
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

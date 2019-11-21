@@ -3,12 +3,10 @@ import firebase from 'firebase/app'
 import { CardObject } from '../types/typings'
 
 const { REACT_APP_API_URL = '' } = process.env
-console.log(`LOG | : REACT_APP_API_URL`, REACT_APP_API_URL)
 const api = ky.extend({
-  // prefixUrl: REACT_APP_API_URL,
   hooks: {
     beforeRequest: [
-      async (request, options) => {
+      async request => {
         const user = firebase.auth().currentUser
         if (user) {
           const token = await user.getIdToken()
