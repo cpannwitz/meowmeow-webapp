@@ -3,21 +3,19 @@
   - add order number (for %4 whichTurn)
   -
 - simplify express server
-- better signup process (name, picture)
+- allow for upload of profile pictures
 - create new CRA
-- PUSH TO GITHUB
-- project todo's: (https://github.com/features/project-management/)
 - setup docz + theming
 - monorepo (https://github.com/biernacki/cra-monorepo)
 - reactions feature
 - computer game
 
-
 FIXED
+
 - seven on seven is broken
 - rankings list is broken
-??? number of cards on hand is broken
-??? host / guest -> userId broken
-BUGS
+  ??? number of cards on hand is broken
+  ??? host / guest -> userId broken
+  BUGS
 - revanche on final screen is broken
 - display of number is broken

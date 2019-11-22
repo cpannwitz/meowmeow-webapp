@@ -8,6 +8,7 @@ const {
   REACT_APP_FIREBASE_STORAGEBUCKET,
   REACT_APP_FIREBASE_MESSAGINGSENDERID,
   REACT_APP_FIREBASE_APPID,
+  REACT_APP_FIREBASE_MEASUREMENTID,
 } = process.env
 
 const isEnvDev = NODE_ENV === 'development' ? true : false
@@ -25,6 +26,7 @@ const systemConfig = {
     storageBucket: REACT_APP_FIREBASE_STORAGEBUCKET,
     messagingSenderId: REACT_APP_FIREBASE_MESSAGINGSENDERID,
     appId: REACT_APP_FIREBASE_APPID,
+    measurementId: REACT_APP_FIREBASE_MEASUREMENTID,
   },
 }
 export default systemConfig

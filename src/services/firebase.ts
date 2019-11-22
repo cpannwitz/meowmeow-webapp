@@ -4,11 +4,12 @@ import 'firebase/firestore'
 import 'firebase/auth'
 import 'firebase/database'
 import 'firebase/messaging'
+import 'firebase/performance'
 
 import systemConfig from '../configs/systemConfig'
 
 firebase.initializeApp({ ...systemConfig.firebase })
-
+firebase.analytics()
 interface UserContext {
   user: firebase.User | null
 }
