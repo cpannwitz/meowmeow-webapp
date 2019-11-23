@@ -7,9 +7,8 @@ import { OpponentImageWrap, OpponentArea } from '../../StyleComponents'
 interface OpponentsRowProps {
   deckLength: number
 }
-const OpponentsRow: React.FC<OpponentsRowProps> = ({ deckLength }: OpponentsRowProps) => {
-  let tempDeck = [...Array.from(Array(deckLength).keys())]
-
+const OpponentsRow: React.FC<OpponentsRowProps> = ({ deckLength = 0 }: OpponentsRowProps) => {
+  const tempDeck = [...Array.from(Array(deckLength < 0 ? 0 : deckLength).keys())]
   return (
     <OpponentArea>
       {tempDeck.map((item, index) => (
