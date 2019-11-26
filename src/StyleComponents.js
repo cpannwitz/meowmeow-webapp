@@ -189,7 +189,7 @@ export const Section = styled.div`
   display: flex;
   flex-direction: ${props => (props.column ? 'column' : 'row')};
   flex-wrap: ${props => (props.nowrap ? 'nowrap' : 'wrap')};
-  justify-content: ${props => (props.spread ? 'space-between' : 'flex-start')};
+  justify-content: ${props => (props.spread ? 'space-between' : `flex-start`)};
   align-items: center;
   margin: 1rem auto;
   padding: ${props => (props.nopad ? '0rem' : '1rem')};
