@@ -11,9 +11,12 @@ import {
   CutyCatsWrap,
   SingleButton,
   BigInputfield,
+  AvatarWrap,
+  InnerImage,
 } from '../StyleComponents'
-import { useSession } from '../services/firebase'
+import { useSession, uploadUserImage } from '../services/firebase'
 import { routePaths } from '../Routes'
+import defaultProfileImage from '../assets/profileimage.svg'
 import styled from 'styled-components'
 
 const Welcome: React.FC = () => {
@@ -25,16 +28,22 @@ const Welcome: React.FC = () => {
     setNewUsername(e.target.value)
   }
 
-  const [newPhotoURL, setNewPhotoURL] = useState(user ? user.photoURL : '')
-  function handleSetNewPhotoURL(e: React.ChangeEvent<HTMLInputElement>) {
-    setNewPhotoURL(e.target.value)
+  const [uploadProgress, setUploadProgress] = useState(0)
+  function handleImageUpload(files: FileList | null) {
+    if (files && files[0]) {
+      uploadUserImage(
+        files[0],
+        setUploadProgress,
+        () => {},
+        () => {}
+      )
+    }
   }
 
   async function handleSubmit() {
     if (user && newUsername.length >= 3) {
       await user.updateProfile({
         displayName: newUsername,
-        photoURL: newPhotoURL,
       })
       history.push(routePaths.dashboard.home)
     }
@@ -52,13 +61,17 @@ const Welcome: React.FC = () => {
       </FullscreenHeader>
 
       <Section>
-        <Subtitle>ProfilePhoto</Subtitle>
-        <BigInputfield
-          type="text"
-          value={newPhotoURL || ''}
-          onChange={handleSetNewPhotoURL}
-          placeholder="https://photo.url.com/"
-        />
+        <Subtitle>ProfilePhoto {uploadProgress > 0 ? uploadProgress + '%' : ''}</Subtitle>
+        <label htmlFor="profileImageUpload">
+          <AvatarWrap>
+            <InputFile
+              id="profileImageUpload"
+              type="file"
+              onChange={e => handleImageUpload(e.target.files)}
+            />
+            <InnerImage src={user && user.photoURL ? user.photoURL : defaultProfileImage} />
+          </AvatarWrap>
+        </label>
         <Subtitle>Please choose a username:</Subtitle>
         <BigInputfield type="text" value={newUsername} onChange={handleSetNewUsername} />
         <SingleButton onClick={handleSubmit}>
@@ -92,4 +105,35 @@ export const Section = styled.div`
   /* bgcolor: transparent? */
   border: 1px solid rgba(255, 255, 255, 0.12);
   position: relative;
+`
+
+export const InputFile = styled.input`
+  /* [type="file"] { */
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+  height: 1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute !important;
+  white-space: nowrap;
+  width: 1px;
+  /* } */
+
+  & + label {
+    background-color: #000;
+    border-radius: 4rem;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    padding-left: 2rem 4rem;
+  }
+
+  &:focus + label,
+  & + label:hover {
+    background-color: #f15d22;
+  }
+
+  &:focus + label {
+    outline: 1px dotted #000;
+  }
 `

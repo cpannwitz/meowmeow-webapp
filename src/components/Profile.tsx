@@ -14,39 +14,25 @@ import {
   Fullscreen,
   Container,
   SingleButton,
-  SmallButton,
   TitleSmall,
   Label,
-  Inputfield,
   AvatarWrap,
   InnerImage,
 } from '../StyleComponents'
-import { useSession } from '../services/firebase'
-import { useToggleState } from '../services/hooks'
+import { useSession, uploadUserImage } from '../services/firebase'
 
 const Profile: React.FC = () => {
   const user = useSession()
 
-  const [isEditing, toggleIsEditing] = useToggleState(false)
-
-  const [newUsername, setNewUsername] = useState(user ? user.displayName : '')
-  function handleSetNewUsername(e: React.ChangeEvent<HTMLInputElement>) {
-    setNewUsername(e.target.value)
-  }
-  const [newPhotoURL, setNewPhotoURL] = useState(user ? user.photoURL : '')
-  function handleSetNewPhotoURL(e: React.ChangeEvent<HTMLInputElement>) {
-    setNewPhotoURL(e.target.value)
-  }
-
-  function handleProfileSave() {
-    if ((newUsername || newPhotoURL) && user) {
-      user
-        .updateProfile({
-          displayName: newUsername,
-          photoURL: newPhotoURL,
-        })
-        .then(() => toggleIsEditing())
-        .catch(e => {})
+  const [uploadProgress, setUploadProgress] = useState(0)
+  function handleImageUpload(files: FileList | null) {
+    if (files && files[0]) {
+      uploadUserImage(
+        files[0],
+        setUploadProgress,
+        () => {},
+        () => {}
+      )
     }
   }
 
@@ -88,44 +74,25 @@ const Profile: React.FC = () => {
   return (
     <Fullscreen>
       <Navbar />
-      {isEditing ? (
-        <SectionColumn>
-          <Label>ProfilePhoto</Label>
-          <Inputfield
-            type="text"
-            value={newPhotoURL || ''}
-            onChange={handleSetNewPhotoURL}
-            placeholder="https://photo.url.com/"
-          />
-          <Label>Username</Label>
-          <Inputfield
-            type="text"
-            value={newUsername || ''}
-            onChange={handleSetNewUsername}
-            placeholder="Username"
-          />
+      {uploadProgress > 0 && (
+        <p>
+          <b>{uploadProgress}</b>
+        </p>
+      )}
 
-          <Container>
-            <SmallButton onClick={toggleIsEditing}>Cancel</SmallButton>
-            <SmallButton onClick={handleProfileSave}>
-              <img src="https://icongr.am/feather/save.svg?size=20&color=ffffff" alt="save-icon" />
-              Save profile
-            </SmallButton>
-          </Container>
-        </SectionColumn>
-      ) : (
-        <Section>
+      <Section>
+        <label htmlFor="profileImageUpload">
           <AvatarWrap>
+            <InputFile
+              id="profileImageUpload"
+              type="file"
+              onChange={e => handleImageUpload(e.target.files)}
+            />
             <InnerImage src={user.photoURL || defaultProfileImage} />
           </AvatarWrap>
-          <TitleSmall style={{ flex: '0 1 75%' }}>{newUsername}</TitleSmall>
-
-          <SmallButton onClick={toggleIsEditing}>
-            <img src="https://icongr.am/feather/edit.svg?size=18&color=ffffff" alt="edit-icon" />
-            Edit Profile
-          </SmallButton>
-        </Section>
-      )}
+        </label>
+        <TitleSmall style={{ flex: '0 1 75%' }}>{user.displayName}</TitleSmall>
+      </Section>
 
       <SectionColumn>
         <Label>PushNotifications</Label>
@@ -186,4 +153,35 @@ export const Section = styled.div`
   /* bgcolor: transparent? */
   border: 1px solid rgba(255, 255, 255, 0.12);
   position: relative;
+`
+
+export const InputFile = styled.input`
+  /* [type="file"] { */
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+  height: 1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute !important;
+  white-space: nowrap;
+  width: 1px;
+  /* } */
+
+  & + label {
+    background-color: #000;
+    border-radius: 4rem;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    padding-left: 2rem 4rem;
+  }
+
+  &:focus + label,
+  & + label:hover {
+    background-color: #f15d22;
+  }
+
+  &:focus + label {
+    outline: 1px dotted #000;
+  }
 `
