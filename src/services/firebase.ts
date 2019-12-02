@@ -6,6 +6,7 @@ import 'firebase/analytics'
 import 'firebase/database'
 import 'firebase/messaging'
 import 'firebase/performance'
+import 'firebase/storage'
 
 import systemConfig from '../configs/systemConfig'
 
@@ -58,3 +59,9 @@ export function logout() {
     .signOut()
     .catch(error => console.error('ERROR | Logout: ', error))
 }
+
+export const getProfileImageRef = (userId: string) =>
+  firebase
+    .storage()
+    .ref()
+    .child(`users/${userId}/profileimage.png`)

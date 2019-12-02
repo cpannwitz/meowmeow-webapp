@@ -14,41 +14,76 @@ import {
   Fullscreen,
   Container,
   SingleButton,
-  SmallButton,
+  // SmallButton,
   TitleSmall,
   Label,
-  Inputfield,
+  // Inputfield,
   AvatarWrap,
   InnerImage,
 } from '../StyleComponents'
-import { useSession } from '../services/firebase'
-import { useToggleState } from '../services/hooks'
+import { useSession, getProfileImageRef } from '../services/firebase'
+// import { useToggleState } from '../services/hooks'
 
 const Profile: React.FC = () => {
   const user = useSession()
 
-  const [isEditing, toggleIsEditing] = useToggleState(false)
+  // const [isEditing, toggleIsEditing] = useToggleState(false)
 
-  const [newUsername, setNewUsername] = useState(user ? user.displayName : '')
-  function handleSetNewUsername(e: React.ChangeEvent<HTMLInputElement>) {
-    setNewUsername(e.target.value)
-  }
-  const [newPhotoURL, setNewPhotoURL] = useState(user ? user.photoURL : '')
-  function handleSetNewPhotoURL(e: React.ChangeEvent<HTMLInputElement>) {
-    setNewPhotoURL(e.target.value)
-  }
+  // const [newUsername, setNewUsername] = useState(user ? user.displayName : '')
+  // function handleSetNewUsername(e: React.ChangeEvent<HTMLInputElement>) {
+  //   setNewUsername(e.target.value)
+  // }
+  // const [newPhotoURL, setNewPhotoURL] = useState(user ? user.photoURL : '')
+  // function handleSetNewPhotoURL(e: React.ChangeEvent<HTMLInputElement>) {
+  //   setNewPhotoURL(e.target.value)
+  // }
 
-  function handleProfileSave() {
-    if ((newUsername || newPhotoURL) && user) {
-      user
-        .updateProfile({
-          displayName: newUsername,
-          photoURL: newPhotoURL,
-        })
-        .then(() => toggleIsEditing())
-        .catch(e => {})
+  const [uploadProgress, setUploadProgress] = useState(0)
+  async function handleImageUpload(files: FileList | null) {
+    if (user && files && files[0]) {
+      console.log(files)
+      const file = files[0]
+      const ref = getProfileImageRef(user.uid)
+      const theUpload = ref.put(file, { contentType: file.type })
+
+      theUpload.on(
+        'state_changed',
+        snapshot => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          setUploadProgress(progress)
+        },
+        error => {
+          // Upload failed
+          setUploadProgress(0)
+        },
+        () => {
+          // Upload successful
+          return theUpload.snapshot.ref.getDownloadURL().then(downloadURL => {
+            user.updateProfile({
+              photoURL: downloadURL,
+            })
+            return setTimeout(() => {
+              setUploadProgress(0)
+            }, 1000)
+          })
+        }
+      )
     }
   }
+
+  // function onUploadProgress(snapS)
+
+  // function handleProfileSave() {
+  //   if ((newUsername || newPhotoURL) && user) {
+  //     user
+  //       .updateProfile({
+  //         displayName: newUsername,
+  //         photoURL: newPhotoURL,
+  //       })
+  //       .then(() => toggleIsEditing())
+  //       .catch(e => {})
+  //   }
+  // }
 
   const [notificationsEnabled, setNotificationsEnabled] = useState(false)
 
@@ -88,7 +123,12 @@ const Profile: React.FC = () => {
   return (
     <Fullscreen>
       <Navbar />
-      {isEditing ? (
+      {uploadProgress > 0 && (
+        <p>
+          <b>{uploadProgress}</b>
+        </p>
+      )}
+      {/* {isEditing ? (
         <SectionColumn>
           <Label>ProfilePhoto</Label>
           <Inputfield
@@ -105,6 +145,13 @@ const Profile: React.FC = () => {
             placeholder="Username"
           />
 
+          <InputFile
+            id="profileImageUpload"
+            type="file"
+            onChange={e => handleImageUpload(e.target.files)}
+          />
+          <label htmlFor="profileImageUpload">yes</label>
+
           <Container>
             <SmallButton onClick={toggleIsEditing}>Cancel</SmallButton>
             <SmallButton onClick={handleProfileSave}>
@@ -113,19 +160,26 @@ const Profile: React.FC = () => {
             </SmallButton>
           </Container>
         </SectionColumn>
-      ) : (
-        <Section>
+      ) : ( */}
+      <Section>
+        <label htmlFor="profileImageUpload">
           <AvatarWrap>
+            <InputFile
+              id="profileImageUpload"
+              type="file"
+              onChange={e => handleImageUpload(e.target.files)}
+            />
             <InnerImage src={user.photoURL || defaultProfileImage} />
           </AvatarWrap>
-          <TitleSmall style={{ flex: '0 1 75%' }}>{newUsername}</TitleSmall>
+        </label>
+        <TitleSmall style={{ flex: '0 1 75%' }}>{user.displayName}</TitleSmall>
 
-          <SmallButton onClick={toggleIsEditing}>
-            <img src="https://icongr.am/feather/edit.svg?size=18&color=ffffff" alt="edit-icon" />
-            Edit Profile
-          </SmallButton>
-        </Section>
-      )}
+        {/* <SmallButton onClick={toggleIsEditing}>
+          <img src="https://icongr.am/feather/edit.svg?size=18&color=ffffff" alt="edit-icon" />
+          Edit Profile
+        </SmallButton> */}
+      </Section>
+      {/* )} */}
 
       <SectionColumn>
         <Label>PushNotifications</Label>
@@ -186,4 +240,35 @@ export const Section = styled.div`
   /* bgcolor: transparent? */
   border: 1px solid rgba(255, 255, 255, 0.12);
   position: relative;
+`
+
+export const InputFile = styled.input`
+  /* [type="file"] { */
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+  height: 1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute !important;
+  white-space: nowrap;
+  width: 1px;
+  /* } */
+
+  & + label {
+    background-color: #000;
+    border-radius: 4rem;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    padding-left: 2rem 4rem;
+  }
+
+  &:focus + label,
+  & + label:hover {
+    background-color: #f15d22;
+  }
+
+  &:focus + label {
+    outline: 1px dotted #000;
+  }
 `

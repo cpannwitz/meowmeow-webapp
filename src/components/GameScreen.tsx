@@ -44,12 +44,7 @@ const GameScreen = () => {
       .doc(matchId)
   )
 
-  function isUserHost() {
-    if (gameData && gameData.guest.id === user.uid) {
-      return false
-    }
-    return true
-  }
+  const isUserHost = gameData && gameData.guest.id === user.uid ? false : true
 
   // ! userStats
   const [userStats, userStatsLoading] = useDocumentDataOnce<UserStats>(userStatsDocument(user.uid))
@@ -248,7 +243,7 @@ const GameScreen = () => {
         <Fullscreen>
           <GameScreenNavbar
             gameData={gameData}
-            isUserHost={isUserHost()}
+            isUserHost={isUserHost}
             handleReturn={handleReturn}
             handleFeatureClick={_addNotifInfo}
           />
