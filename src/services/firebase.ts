@@ -58,6 +58,7 @@ export function uploadUserImage(
     theUpload.on(
       'state_changed',
       snapshot => {
+        // upload progress
         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
         onProgress(progress)
       },
