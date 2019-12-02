@@ -14,76 +14,27 @@ import {
   Fullscreen,
   Container,
   SingleButton,
-  // SmallButton,
   TitleSmall,
   Label,
-  // Inputfield,
   AvatarWrap,
   InnerImage,
 } from '../StyleComponents'
-import { useSession, getProfileImageRef } from '../services/firebase'
-// import { useToggleState } from '../services/hooks'
+import { useSession, uploadUserImage } from '../services/firebase'
 
 const Profile: React.FC = () => {
   const user = useSession()
 
-  // const [isEditing, toggleIsEditing] = useToggleState(false)
-
-  // const [newUsername, setNewUsername] = useState(user ? user.displayName : '')
-  // function handleSetNewUsername(e: React.ChangeEvent<HTMLInputElement>) {
-  //   setNewUsername(e.target.value)
-  // }
-  // const [newPhotoURL, setNewPhotoURL] = useState(user ? user.photoURL : '')
-  // function handleSetNewPhotoURL(e: React.ChangeEvent<HTMLInputElement>) {
-  //   setNewPhotoURL(e.target.value)
-  // }
-
   const [uploadProgress, setUploadProgress] = useState(0)
-  async function handleImageUpload(files: FileList | null) {
-    if (user && files && files[0]) {
-      console.log(files)
-      const file = files[0]
-      const ref = getProfileImageRef(user.uid)
-      const theUpload = ref.put(file, { contentType: file.type })
-
-      theUpload.on(
-        'state_changed',
-        snapshot => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-          setUploadProgress(progress)
-        },
-        error => {
-          // Upload failed
-          setUploadProgress(0)
-        },
-        () => {
-          // Upload successful
-          return theUpload.snapshot.ref.getDownloadURL().then(downloadURL => {
-            user.updateProfile({
-              photoURL: downloadURL,
-            })
-            return setTimeout(() => {
-              setUploadProgress(0)
-            }, 1000)
-          })
-        }
+  function handleImageUpload(files: FileList | null) {
+    if (files && files[0]) {
+      uploadUserImage(
+        files[0],
+        setUploadProgress,
+        () => {},
+        () => {}
       )
     }
   }
-
-  // function onUploadProgress(snapS)
-
-  // function handleProfileSave() {
-  //   if ((newUsername || newPhotoURL) && user) {
-  //     user
-  //       .updateProfile({
-  //         displayName: newUsername,
-  //         photoURL: newPhotoURL,
-  //       })
-  //       .then(() => toggleIsEditing())
-  //       .catch(e => {})
-  //   }
-  // }
 
   const [notificationsEnabled, setNotificationsEnabled] = useState(false)
 
@@ -128,39 +79,7 @@ const Profile: React.FC = () => {
           <b>{uploadProgress}</b>
         </p>
       )}
-      {/* {isEditing ? (
-        <SectionColumn>
-          <Label>ProfilePhoto</Label>
-          <Inputfield
-            type="text"
-            value={newPhotoURL || ''}
-            onChange={handleSetNewPhotoURL}
-            placeholder="https://photo.url.com/"
-          />
-          <Label>Username</Label>
-          <Inputfield
-            type="text"
-            value={newUsername || ''}
-            onChange={handleSetNewUsername}
-            placeholder="Username"
-          />
 
-          <InputFile
-            id="profileImageUpload"
-            type="file"
-            onChange={e => handleImageUpload(e.target.files)}
-          />
-          <label htmlFor="profileImageUpload">yes</label>
-
-          <Container>
-            <SmallButton onClick={toggleIsEditing}>Cancel</SmallButton>
-            <SmallButton onClick={handleProfileSave}>
-              <img src="https://icongr.am/feather/save.svg?size=20&color=ffffff" alt="save-icon" />
-              Save profile
-            </SmallButton>
-          </Container>
-        </SectionColumn>
-      ) : ( */}
       <Section>
         <label htmlFor="profileImageUpload">
           <AvatarWrap>
@@ -173,13 +92,7 @@ const Profile: React.FC = () => {
           </AvatarWrap>
         </label>
         <TitleSmall style={{ flex: '0 1 75%' }}>{user.displayName}</TitleSmall>
-
-        {/* <SmallButton onClick={toggleIsEditing}>
-          <img src="https://icongr.am/feather/edit.svg?size=18&color=ffffff" alt="edit-icon" />
-          Edit Profile
-        </SmallButton> */}
       </Section>
-      {/* )} */}
 
       <SectionColumn>
         <Label>PushNotifications</Label>

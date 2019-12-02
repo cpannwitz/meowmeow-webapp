@@ -19,17 +19,11 @@ export const UserContext = createContext<UserContext>({
   user: null,
 })
 
-/**
- *
- */
 export function useSession() {
   const { user } = useContext(UserContext)
   return user
 }
 
-/**
- *
- */
 export function useAuth() {
   const [state, setState] = useState(() => {
     const user = firebase.auth().currentUser
@@ -50,9 +44,44 @@ export function useAuth() {
   return state
 }
 
-/**
- *
- */
+export function uploadUserImage(
+  file: File,
+  onProgress: (progress: number) => void,
+  onError: (error: Error) => void,
+  onSuccess: () => void
+) {
+  const user = firebase.auth().currentUser
+  if (user && file) {
+    const ref = getProfileImageRef(user.uid)
+    const theUpload = ref.put(file, { contentType: file.type })
+
+    theUpload.on(
+      'state_changed',
+      snapshot => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        onProgress(progress)
+      },
+      error => {
+        // Upload failed
+        onProgress(0)
+        onError(error)
+      },
+      () => {
+        // Upload successful
+        return theUpload.snapshot.ref.getDownloadURL().then(downloadURL => {
+          user.updateProfile({
+            photoURL: downloadURL,
+          })
+          setTimeout(() => {
+            onProgress(0)
+          }, 1000)
+          return onSuccess()
+        })
+      }
+    )
+  }
+}
+
 export function logout() {
   firebase
     .auth()
