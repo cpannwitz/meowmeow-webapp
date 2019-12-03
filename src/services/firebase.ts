@@ -69,15 +69,17 @@ export function uploadUserImage(
       },
       () => {
         // Upload successful
-        return theUpload.snapshot.ref.getDownloadURL().then(downloadURL => {
-          user.updateProfile({
-            photoURL: downloadURL,
+        return getProfileThumbnailRef(user.uid)
+          .getDownloadURL()
+          .then(downloadURL => {
+            user.updateProfile({
+              photoURL: downloadURL,
+            })
+            setTimeout(() => {
+              onProgress(0)
+            }, 1000)
+            return onSuccess()
           })
-          setTimeout(() => {
-            onProgress(0)
-          }, 1000)
-          return onSuccess()
-        })
       }
     )
   }
@@ -95,3 +97,8 @@ export const getProfileImageRef = (userId: string) =>
     .storage()
     .ref()
     .child(`users/${userId}/profileimage.png`)
+export const getProfileThumbnailRef = (userId: string) =>
+  firebase
+    .storage()
+    .ref()
+    .child(`users/${userId}/thumbnail/profileimage_256x256.png`)
