@@ -22,8 +22,8 @@ export function initUser() {
     api
       .get(REACT_APP_API_URL + '/api/initUser')
       .json()
-      .then(result => resolve(result))
-      .catch(error => reject(error))
+      .then(resolve)
+      .catch(reject)
   })
 }
 
@@ -36,8 +36,8 @@ export function startGame(gameId: string) {
         },
       })
       .json()
-      .then(result => resolve(result))
-      .catch(error => reject(error))
+      .then(resolve)
+      .catch(reject)
   })
 }
 
@@ -48,8 +48,8 @@ export function rejectGame(gameId: string) {
         json: { gameId },
       })
       .json()
-      .then(result => resolve(result))
-      .catch(error => reject(error))
+      .then(resolve)
+      .catch(reject)
   })
 }
 
@@ -60,8 +60,8 @@ export function createGame(guestId: string) {
         json: { guestId },
       })
       .json()
-      .then(result => resolve(result))
-      .catch(error => reject(error))
+      .then(resolve)
+      .catch(reject)
   })
 }
 
@@ -72,8 +72,8 @@ export function matchActionTakeSuspension(gameId: string) {
         json: { gameId },
       })
       .json()
-      .then(result => resolve(result))
-      .catch(error => reject(error))
+      .then(resolve)
+      .catch(reject)
   })
 }
 
@@ -84,8 +84,8 @@ export function matchActionDraw(gameId: string, penalty?: number) {
         json: { gameId, penalty },
       })
       .json()
-      .then(result => resolve(result))
-      .catch(error => reject(error))
+      .then(resolve)
+      .catch(reject)
   })
 }
 
@@ -96,7 +96,39 @@ export function matchActionPut(gameId: string, card: CardObject, jackWish?: stri
         json: { gameId, card, jackWish },
       })
       .json()
-      .then(result => resolve(result))
-      .catch(error => reject(error))
+      .then(resolve)
+      .catch(reject)
+  })
+}
+
+export function setPushNotificationsToken(token: string) {
+  return new Promise((resolve, reject) => {
+    api
+      .post(REACT_APP_API_URL + '/api/setPushNotificationsToken', {
+        json: {
+          token: token,
+        },
+      })
+      .json()
+      .then(resolve)
+      .catch(reject)
+  })
+}
+export function removePushNotificationsToken() {
+  return new Promise((resolve, reject) => {
+    api
+      .delete(REACT_APP_API_URL + '/api/removePushNotificationsToken')
+      .json()
+      .then(resolve)
+      .catch(reject)
+  })
+}
+export function getPushNotificationsState() {
+  return new Promise((resolve, reject) => {
+    api
+      .get(REACT_APP_API_URL + '/api/getPushNotificationsState')
+      .json()
+      .then(resolve)
+      .catch(reject)
   })
 }

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import {
-  checkSubscription,
+  checkPushNotifications,
   enablePushNotifications,
   disablePushNotifications,
 } from '../services/pushNotifications'
@@ -20,6 +20,7 @@ import {
   InnerImage,
 } from '../StyleComponents'
 import { useSession, uploadUserImage } from '../services/firebase'
+import { useAsync } from 'react-use'
 
 const Profile: React.FC = () => {
   const user = useSession()
@@ -36,11 +37,15 @@ const Profile: React.FC = () => {
     }
   }
 
+  const { loading: notificationStateLoading } = useAsync(() =>
+    checkPushNotifications().then(result => setNotificationsEnabled(result))
+  )
+
   const [notificationsEnabled, setNotificationsEnabled] = useState(false)
 
   function handleSubscription() {
     if (user) {
-      enablePushNotifications(user.uid)
+      enablePushNotifications()
         .then(() => setNotificationsEnabled(true))
         .catch(error => {})
     }
@@ -48,20 +53,11 @@ const Profile: React.FC = () => {
 
   function handleUnsubscription() {
     if (user) {
-      disablePushNotifications(user.uid)
+      disablePushNotifications()
         .then(() => setNotificationsEnabled(false))
         .catch(error => {})
     }
   }
-
-  useEffect(() => {
-    if (user) {
-      checkSubscription(user.uid)
-        .then(result => setNotificationsEnabled(result))
-        .catch(error => {})
-    }
-    //eslint-disable-next-line
-  }, [user])
 
   if (!user) {
     return (
@@ -74,11 +70,6 @@ const Profile: React.FC = () => {
   return (
     <Fullscreen>
       <Navbar />
-      {uploadProgress > 0 && (
-        <p>
-          <b>{uploadProgress}</b>
-        </p>
-      )}
 
       <Section>
         <label htmlFor="profileImageUpload">
@@ -91,12 +82,17 @@ const Profile: React.FC = () => {
             <InnerImage src={user.photoURL || defaultProfileImage} />
           </AvatarWrap>
         </label>
-        <TitleSmall style={{ flex: '0 1 75%' }}>{user.displayName}</TitleSmall>
+        <TitleSmall style={{ flex: '0 1 75%' }}>
+          {user.displayName}
+          {uploadProgress > 0 ? uploadProgress : ''}
+        </TitleSmall>
       </Section>
 
       <SectionColumn>
         <Label>PushNotifications</Label>
-        {notificationsEnabled ? (
+        {notificationStateLoading ? (
+          <span>loading...</span>
+        ) : notificationsEnabled ? (
           <SingleButton onClick={handleUnsubscription}>
             <img
               src="https://icongr.am/feather/bell-off.svg?size=20&color=ffffff"
