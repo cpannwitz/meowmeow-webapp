@@ -11,7 +11,7 @@ import 'firebase/storage'
 import systemConfig from '../configs/systemConfig'
 
 firebase.initializeApp({ ...systemConfig.firebase })
-firebase.analytics()
+firebase.analytics().setAnalyticsCollectionEnabled(false)
 interface UserContext {
   user: firebase.User | null
 }
