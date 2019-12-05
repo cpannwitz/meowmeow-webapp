@@ -20,14 +20,9 @@ export const routePaths = {
   match: '/match/:matchId',
 }
 
-const CustomRoute: React.FC<{ isPrivate?: boolean; isPublic?: boolean } & RouteProps> = ({
-  isPrivate,
-  isPublic,
-  children,
-  ...rest
-}) => {
+const PrivateRoute: React.FC<RouteProps> = ({ children, ...rest }) => {
   const user = useSession()
-  if (!user && isPrivate) {
+  if (!user) {
     return (
       <Route
         render={({ location }) => (
@@ -41,7 +36,11 @@ const CustomRoute: React.FC<{ isPrivate?: boolean; isPublic?: boolean } & RouteP
       ></Route>
     )
   }
-  if (user && isPublic) {
+  return <Route {...rest} render={() => <>{children}</>}></Route>
+}
+const PublicRoute: React.FC<RouteProps> = ({ children, ...rest }) => {
+  const user = useSession()
+  if (user) {
     return (
       <Route
         render={({ location }) => (
@@ -62,11 +61,11 @@ const Routes = () => {
   return (
     <Router>
       <Switch>
-        <CustomRoute exact path={routePaths.home} component={Home} isPublic />
-        <CustomRoute path={routePaths.dashboard.home} component={Dashboard} isPrivate />
-        <CustomRoute path={routePaths.profile} component={Profile} isPrivate />
-        <CustomRoute path={routePaths.welcome} component={Welcome} isPrivate />
-        <CustomRoute path={routePaths.match} component={GameScreen} isPrivate />
+        <PublicRoute exact path={routePaths.home} component={Home} />
+        <PrivateRoute path={routePaths.dashboard.home} component={Dashboard} />
+        <PrivateRoute path={routePaths.profile} component={Profile} />
+        <PrivateRoute path={routePaths.welcome} component={Welcome} />
+        <PrivateRoute path={routePaths.match} component={GameScreen} />
       </Switch>
     </Router>
   )

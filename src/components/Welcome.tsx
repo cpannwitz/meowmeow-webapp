@@ -14,7 +14,8 @@ import {
   AvatarWrap,
   InnerImage,
 } from '../StyleComponents'
-import { useSession, uploadUserImage } from '../services/firebase'
+import { useSession } from '../services/firebase'
+import { uploadProfileImage } from '../services/uploadProfileImage'
 import { routePaths } from '../Routes'
 import defaultProfileImage from '../assets/profileimage.svg'
 import styled from 'styled-components'
@@ -31,7 +32,7 @@ const Welcome: React.FC = () => {
   const [uploadProgress, setUploadProgress] = useState(0)
   function handleImageUpload(files: FileList | null) {
     if (files && files[0]) {
-      uploadUserImage(
+      uploadProfileImage(
         files[0],
         setUploadProgress,
         () => {},

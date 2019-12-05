@@ -12,8 +12,8 @@ if (firebase.messaging.isSupported()) {
 }
 
 export function handlePushNotifications(payload: any) {
-  // TODO: better handling! Maybe show toast
-  console.log(`LOG | : Messagewas received: `, payload)
+  // TODO: How to handle ingame notifications?
+  console.log(`LOG | : PushNotification was received: `, payload)
 }
 
 export async function checkPushNotifications(): Promise<boolean> {

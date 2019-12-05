@@ -1,16 +1,11 @@
 import React, { useState } from 'react'
-import Modal from 'react-modal'
-import firebase from 'firebase/app'
+import styled from 'styled-components'
 import { useParams, useHistory } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import firebase from 'firebase/app'
 import { useDocumentDataOnce, useDocumentData } from 'react-firebase-hooks/firestore'
-import LoadingSpinner from './LoadingSpinner'
 
-// CUSTOM CSS
-import IconSpade from '../assets/icon_spade.svg'
-import IconClub from '../assets/icon_club.svg'
-import IconHeart from '../assets/icon_heart.svg'
-import IconDiamond from '../assets/icon_diamond.svg'
+import LoadingSpinner from './LoadingSpinner'
 
 // GAME COMPONENTS
 import GameScreenNavbar from './GameScreenComponents/GameScreenNavbar'
@@ -22,13 +17,13 @@ import PileAndStack from './GameScreenComponents/PileAndStack'
 import ActionBar from './GameScreenComponents/ActionBar'
 import InfoBar from './GameScreenComponents/InfoBar'
 
-import { XXX, Subtitle, ModalCloseBtn, JackWishColor } from '../StyleComponents'
+import { XXX } from '../StyleComponents'
 import { routePaths } from '../Routes'
 import { useSession } from '../services/firebase'
-import styled from 'styled-components'
 import { matchActionTakeSuspension, matchActionDraw, matchActionPut } from '../services/api'
 import { GameObject, CardObject, UserStats } from '../types/typings'
 import { userStatsDocument } from '../services/firebaseQueries'
+import JackWishModal from './GameScreenComponents/JackWishModal'
 
 const GameScreen = () => {
   const user = useSession() as firebase.User
@@ -210,35 +205,9 @@ const GameScreen = () => {
 
   return (
     <XXX>
-      <Modal
-        isOpen={openModalState.jackWishOpen}
-        onRequestClose={() => closeModal()}
-        contentLabel="Jacks-Wish-A-Color"
-        className={{
-          base: 'modal-popup',
-          afterOpen: 'modal-popup_after-open',
-          beforeClose: 'modal-popup_before-close',
-        }}
-        overlayClassName={{
-          base: 'modal-popup-overlay',
-          afterOpen: 'modal-popup-overlay_after-open',
-          beforeClose: 'modal-popup-overlay_before-close',
-        }}
-      >
-        <ModalCloseBtn onClick={() => closeModal()} />
-        <Subtitle>Which color do you choose?</Subtitle>
-        <Container>
-          <JackWishColor src={IconSpade} alt="icon-spade" onClick={() => closeModal('spade')} />
-          <JackWishColor src={IconHeart} alt="icon-heart" onClick={() => closeModal('heart')} />
-          <JackWishColor src={IconClub} alt="icon-club" onClick={() => closeModal('club')} />
-          <JackWishColor
-            src={IconDiamond}
-            alt="icon-diamond"
-            onClick={() => closeModal('diamond')}
-          />
-        </Container>
-      </Modal>
-
+      {openModalState.jackWishOpen && (
+        <JackWishModal isOpen={openModalState.jackWishOpen} onClose={closeModal}></JackWishModal>
+      )}
       {gameData && userStats && deckData && pileData && !dataLoading ? (
         <Fullscreen>
           <GameScreenNavbar

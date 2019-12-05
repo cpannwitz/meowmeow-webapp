@@ -19,7 +19,8 @@ import {
   AvatarWrap,
   InnerImage,
 } from '../StyleComponents'
-import { useSession, uploadUserImage } from '../services/firebase'
+import { useSession } from '../services/firebase'
+import { uploadProfileImage } from '../services/uploadProfileImage'
 import { useAsync } from 'react-use'
 
 const Profile: React.FC = () => {
@@ -28,7 +29,7 @@ const Profile: React.FC = () => {
   const [uploadProgress, setUploadProgress] = useState(0)
   function handleImageUpload(files: FileList | null) {
     if (files && files[0]) {
-      uploadUserImage(
+      uploadProfileImage(
         files[0],
         setUploadProgress,
         () => {},
