@@ -1,22 +1,14 @@
-export function calcDuration(begin: string) {
-  const date_now = new Date()
-  let seconds = Math.floor((date_now.getTime() - new Date(begin).getTime()) / 1000)
-  let minutes = Math.floor(seconds / 60)
-  let hours = Math.floor(minutes / 60)
-  let days = Math.floor(hours / 24)
-  const months = Math.floor(days / 30)
-  const years = Math.floor(months / 12)
-  days = days - months * 30
-  hours = hours - days * 24
-  minutes = minutes - days * 24 * 60 - hours * 60
-  seconds = seconds - days * 24 * 60 * 60 - hours * 60 * 60 - minutes * 60
-  return { years, months, days, hours, minutes, seconds }
-}
-
-export function NEW_dateDifference(begin: string) {
+export function getTimeInFrames(begin: string) {
   const date_now = new Date().getTime()
   const date = new Date(begin).getTime()
   let delta = Math.abs(date - date_now) / 1000
+
+  const years = Math.floor(delta / 31104000)
+  delta -= years * 31104000
+
+  const months = Math.floor(delta / 2592000)
+  delta -= months * 2592000
+
   const days = Math.floor(delta / 86400)
   delta -= days * 86400
 
@@ -26,13 +18,13 @@ export function NEW_dateDifference(begin: string) {
   const minutes = Math.floor(delta / 60) % 60
   delta -= minutes * 60
 
-  const seconds = delta % 60
+  const seconds = Math.floor(delta % 60)
 
-  return { days, hours, minutes, seconds }
+  return { years, months, days, hours, minutes, seconds }
 }
 
 export function getDurationIntel(begin: string) {
-  let duration = NEW_dateDifference(begin)
+  let duration = getTimeInFrames(begin)
 
   if (duration.days > 0) {
     return duration.days + 'd ago'

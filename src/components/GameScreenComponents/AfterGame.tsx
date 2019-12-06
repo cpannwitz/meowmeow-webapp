@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { calcDuration } from '../../services/utils'
+import { getTimeInFrames } from '../../services/utils'
 import { PyroShow } from '../../styles/pyro'
 
 import {
@@ -42,6 +42,8 @@ const AfterGame: React.FC<AfterGameProps> = ({
       })
   }
 
+  const gameDuration = getTimeInFrames(gameData.createdAt)
+
   return (
     <Fullscreen>
       {gameData.winner === userId ? (
@@ -81,13 +83,13 @@ const AfterGame: React.FC<AfterGameProps> = ({
         <Label>Total game duration: </Label>
         <ContainerFlat>
           <SubtitleSmall>
-            <Bolded>&nbsp;{calcDuration(gameData.createdAt).days}</Bolded> days
+            <Bolded>&nbsp;{gameDuration.days}</Bolded> days
           </SubtitleSmall>
           <SubtitleSmall>
-            <Bolded>&nbsp;{calcDuration(gameData.createdAt).hours}</Bolded> hours
+            <Bolded>&nbsp;{gameDuration.hours}</Bolded> hours
           </SubtitleSmall>
           <SubtitleSmall>
-            <Bolded>&nbsp;{calcDuration(gameData.createdAt).minutes}</Bolded> minutes.
+            <Bolded>&nbsp;{gameDuration.minutes}</Bolded> minutes.
           </SubtitleSmall>
         </ContainerFlat>
       </Container>
