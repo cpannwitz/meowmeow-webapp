@@ -12,17 +12,16 @@ import { inivitedGamesCollection } from '../services/firebaseQueries'
 const Invitelist: React.FC = () => {
   const user = useSession()
   const [invitedGames, invitedGamesLoading] = useCollectionData<GameObject>(
-    inivitedGamesCollection(user ? user.uid : '')
+    inivitedGamesCollection(user?.uid ?? '')
   )
 
-  const filteredInvitedGames =
-    invitedGames && user ? invitedGames.filter(game => game.host.id !== user.uid) : undefined
+  const filteredInvitedGames = invitedGames?.filter(game => game.host.id !== user?.uid) ?? []
 
   return (
     <Section>
       {!invitedGamesLoading ? (
         <Container>
-          {filteredInvitedGames && filteredInvitedGames.length > 0 ? (
+          {filteredInvitedGames.length > 0 ? (
             <StyledList>
               {filteredInvitedGames.map(gameData => (
                 <InvitelistItem key={gameData.gameId} gameData={gameData} />

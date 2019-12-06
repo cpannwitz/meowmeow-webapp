@@ -17,6 +17,28 @@ export const userStatsDocument = (userId: string) =>
     .collection('userstats')
     .doc(userId)
 
+export const gameObjectDocument = (matchId: string) =>
+  firebase
+    .firestore()
+    .collection('games')
+    .doc(matchId)
+
+export const deckDataDocument = (matchId: string, userId: string) =>
+  firebase
+    .firestore()
+    .collection('games')
+    .doc(matchId)
+    .collection('decks')
+    .doc(userId)
+
+export const pileDataDocument = (matchId: string) =>
+  firebase
+    .firestore()
+    .collection('games')
+    .doc(matchId)
+    .collection('decks')
+    .doc('pile')
+
 export const openGamesCollection = (userId: string) =>
   firebase
     .firestore()

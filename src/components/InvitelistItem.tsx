@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import LoadingSpinner from './LoadingSpinner'
-import { getDurationIntel } from '../services/utils'
-
 import { ListItem, InlineButton, Truncated, Smalltext } from '../StyleComponents'
-import { useSession } from '../services/firebase'
+
 import { startGame, rejectGame } from '../services/api'
+import { getDurationIntel } from '../services/utils'
+import { useSession } from '../services/firebase'
 import { GameObject } from '../types/typings'
 
 interface InvitelistItemProps {

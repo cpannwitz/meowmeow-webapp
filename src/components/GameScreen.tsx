@@ -1,16 +1,10 @@
 import React, { useState } from 'react'
-import Modal from 'react-modal'
-import firebase from 'firebase/app'
+import styled from 'styled-components'
 import { useParams, useHistory } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { useDocumentDataOnce, useDocumentData } from 'react-firebase-hooks/firestore'
-import LoadingSpinner from './LoadingSpinner'
 
-// CUSTOM CSS
-import IconSpade from '../assets/icon_spade.svg'
-import IconClub from '../assets/icon_club.svg'
-import IconHeart from '../assets/icon_heart.svg'
-import IconDiamond from '../assets/icon_diamond.svg'
+import LoadingSpinner from './LoadingSpinner'
 
 // GAME COMPONENTS
 import GameScreenNavbar from './GameScreenComponents/GameScreenNavbar'
@@ -21,52 +15,44 @@ import LastActions from './GameScreenComponents/LastActions'
 import PileAndStack from './GameScreenComponents/PileAndStack'
 import ActionBar from './GameScreenComponents/ActionBar'
 import InfoBar from './GameScreenComponents/InfoBar'
+import JackWishModal from './GameScreenComponents/JackWishModal'
 
-import { XXX, Subtitle, ModalCloseBtn, JackWishColor } from '../StyleComponents'
+import { XXX } from '../StyleComponents'
 import { routePaths } from '../Routes'
 import { useSession } from '../services/firebase'
-import styled from 'styled-components'
 import { matchActionTakeSuspension, matchActionDraw, matchActionPut } from '../services/api'
+import {
+  userStatsDocument,
+  gameObjectDocument,
+  deckDataDocument,
+  pileDataDocument,
+} from '../services/firebaseQueries'
 import { GameObject, CardObject, UserStats } from '../types/typings'
-import { userStatsDocument } from '../services/firebaseQueries'
 
 const GameScreen = () => {
-  const user = useSession() as firebase.User
+  const user = useSession()
 
   const { matchId } = useParams()
   const history = useHistory()
 
   // ! fetch & subscribe gameData
-  const [gameData, gameDataLoading] = useDocumentData<GameObject>(
-    firebase
-      .firestore()
-      .collection('games')
-      .doc(matchId)
-  )
+  const [gameData, gameDataLoading] = useDocumentData<GameObject>(gameObjectDocument(matchId || ''))
 
-  const isUserHost = gameData && gameData.guest.id === user.uid ? false : true
+  const isUserHost = gameData && user && gameData.guest.id === user.uid ? false : true
 
   // ! userStats
-  const [userStats, userStatsLoading] = useDocumentDataOnce<UserStats>(userStatsDocument(user.uid))
+  const [userStats, userStatsLoading] = useDocumentDataOnce<UserStats>(
+    userStatsDocument(user?.uid ?? '')
+  )
 
   // ! fetch & subscribe deckData
   const [deckData, deckDataLoading] = useDocumentData<{ deck: CardObject[] }>(
-    firebase
-      .firestore()
-      .collection('games')
-      .doc(matchId)
-      .collection('decks')
-      .doc(user.uid)
+    deckDataDocument(matchId || '', user?.uid ?? '')
   )
 
   // ! fetch & subscribe pileData
   const [pileData, pileDataLoading] = useDocumentData<{ pile: CardObject[] }>(
-    firebase
-      .firestore()
-      .collection('games')
-      .doc(matchId)
-      .collection('decks')
-      .doc('pile')
+    pileDataDocument(matchId || '')
   )
 
   // ! combined loading state
@@ -138,17 +124,17 @@ const GameScreen = () => {
   const [pendingAction, setPendingAction] = useState(false)
 
   async function handleCardAction(card: CardObject, jackWish?: string) {
-    if (gameData && gameData.whichTurn === user.uid && pendingAction === false) {
-      const preCondition = gameData.preCondition
+    if (gameData?.whichTurn === user?.uid && pendingAction === false) {
+      const preCondition = gameData?.preCondition
       if (
-        (preCondition.enabled && preCondition.suspended && card.value !== 'ace') ||
-        (preCondition.enabled && preCondition.toDraw !== 0 && card.value !== '7') ||
-        (preCondition.enabled && preCondition.newColor !== '' && card.value === 'jack')
+        (preCondition?.enabled && preCondition.suspended && card.value !== 'ace') ||
+        (preCondition?.enabled && preCondition.toDraw !== 0 && card.value !== '7') ||
+        (preCondition?.enabled && preCondition.newColor !== '' && card.value === 'jack')
       ) {
         _addNotifWrongCard()
       } else {
         setPendingAction(true)
-        const cardAction = await matchActionPut(gameData.gameId, card, jackWish)
+        const cardAction = await matchActionPut(gameData?.gameId ?? '', card, jackWish)
         if (!cardAction) {
           _addNotifWrongCard()
         }
@@ -166,14 +152,9 @@ const GameScreen = () => {
   // ------------------------------------------------------------
 
   async function handleDrawAction() {
-    if (
-      gameData &&
-      gameData.whichTurn === user.uid &&
-      !gameData.preCondition.suspended &&
-      !pendingAction
-    ) {
+    if (gameData?.whichTurn === user?.uid && !gameData?.preCondition.suspended && !pendingAction) {
       setPendingAction(true)
-      await matchActionDraw(gameData.gameId)
+      await matchActionDraw(gameData?.gameId ?? '')
       setPendingAction(false)
     } else {
       _addNotifNotYourTurn()
@@ -188,10 +169,9 @@ const GameScreen = () => {
 
   async function handleTakeSuspension() {
     if (
-      gameData &&
-      gameData.whichTurn === user.uid &&
-      gameData.preCondition.enabled === true &&
-      gameData.preCondition.suspended === true &&
+      gameData?.whichTurn === user?.uid &&
+      gameData?.preCondition.enabled === true &&
+      gameData?.preCondition.suspended === true &&
       !pendingAction
     ) {
       setPendingAction(true)
@@ -210,35 +190,9 @@ const GameScreen = () => {
 
   return (
     <XXX>
-      <Modal
-        isOpen={openModalState.jackWishOpen}
-        onRequestClose={() => closeModal()}
-        contentLabel="Jacks-Wish-A-Color"
-        className={{
-          base: 'modal-popup',
-          afterOpen: 'modal-popup_after-open',
-          beforeClose: 'modal-popup_before-close',
-        }}
-        overlayClassName={{
-          base: 'modal-popup-overlay',
-          afterOpen: 'modal-popup-overlay_after-open',
-          beforeClose: 'modal-popup-overlay_before-close',
-        }}
-      >
-        <ModalCloseBtn onClick={() => closeModal()} />
-        <Subtitle>Which color do you choose?</Subtitle>
-        <Container>
-          <JackWishColor src={IconSpade} alt="icon-spade" onClick={() => closeModal('spade')} />
-          <JackWishColor src={IconHeart} alt="icon-heart" onClick={() => closeModal('heart')} />
-          <JackWishColor src={IconClub} alt="icon-club" onClick={() => closeModal('club')} />
-          <JackWishColor
-            src={IconDiamond}
-            alt="icon-diamond"
-            onClick={() => closeModal('diamond')}
-          />
-        </Container>
-      </Modal>
-
+      {openModalState.jackWishOpen && (
+        <JackWishModal isOpen={openModalState.jackWishOpen} onClose={closeModal}></JackWishModal>
+      )}
       {gameData && userStats && deckData && pileData && !dataLoading ? (
         <Fullscreen>
           <GameScreenNavbar
@@ -249,7 +203,7 @@ const GameScreen = () => {
           />
           {!gameData.finished ? (
             <Container>
-              <LastActions gameData={gameData} />
+              <LastActions lastAction={gameData.lastActions[0]} />
               <OpponentsRow
                 deckLength={isUserHost ? gameData.guestdeckLength : gameData.hostdeckLength}
               />
@@ -258,10 +212,9 @@ const GameScreen = () => {
               <ActionBar
                 handleDrawAction={handleDrawAction}
                 handleTakeSuspension={handleTakeSuspension}
-                gameData={gameData}
               />
               <DeckRow
-                myTurn={gameData.whichTurn === user.uid}
+                myTurn={gameData.whichTurn === user?.uid}
                 pendingAction={pendingAction}
                 cards={deckData.deck}
                 openModal={openModal}
@@ -272,7 +225,7 @@ const GameScreen = () => {
             <AfterGame
               gameData={gameData}
               opponentId={isUserHost ? gameData.guest.id : gameData.host.id}
-              userId={user.uid}
+              userId={user?.uid ?? ''}
               userStats={userStats}
             />
           )}

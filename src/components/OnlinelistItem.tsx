@@ -12,6 +12,7 @@ interface OnlinelistItemProps {
 const OnlinelistItem = ({ onlineUser }: OnlinelistItemProps) => {
   const [pendingGameCreation, setPendingGameCreation] = useState(false)
   const [gameCreated, setGameCreated] = useState(false)
+
   function handleCreateGame() {
     if (onlineUser.uid) {
       setPendingGameCreation(true)

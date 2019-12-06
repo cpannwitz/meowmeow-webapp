@@ -33,9 +33,6 @@ const GameScreenNavbar: React.FC<GameScreenNavbarProps> = ({
       {user.uid === gameData.whichTurn ? (
         <MatchStatus positive>
           <Truncated>It's your turn!</Truncated>
-          {/* <AvatarWrapSmall>
-            <InnerImage src={user.photoURL || defaultProfileImage} />
-          </AvatarWrapSmall> */}
         </MatchStatus>
       ) : (
         <MatchStatus positive={false}>

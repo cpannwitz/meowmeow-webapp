@@ -4,26 +4,27 @@ import { useHistory } from 'react-router-dom'
 import fb from 'firebase/app'
 import { Button } from '../styles/styledComponents'
 import { initUser } from '../services/api'
+import { authVariants } from '../configs/authVariants'
 
 interface AuthButtonProps {
-  provider: fb.auth.AuthProvider
-  icon: string
-  label: string
+  variant: keyof typeof authVariants
 }
-const AuthButton: React.FC<AuthButtonProps> = ({ provider, icon, label }: AuthButtonProps) => {
+const AuthButton: React.FC<AuthButtonProps> = ({ variant }: AuthButtonProps) => {
   const history = useHistory()
 
+  const data = authVariants[variant]
+
   async function handleLogin() {
-    const result = await fb.auth().signInWithPopup(provider)
+    const result = await fb.auth().signInWithPopup(data.provider)
     const user = result.user
 
     if (user) {
       await initUser()
 
-      if (user.displayName) {
-        return history.push('/dashboard')
+      if (result.additionalUserInfo?.isNewUser) {
+        return history.push('/welcome')
       }
-      return history.push('/welcome')
+      return history.push('/dashboard')
     } else {
       throw new Error('Couldn"t sign in.')
     }
@@ -31,8 +32,8 @@ const AuthButton: React.FC<AuthButtonProps> = ({ provider, icon, label }: AuthBu
 
   return (
     <Button onClick={handleLogin}>
-      <img src={icon} alt="logout-icon" />
-      {label}
+      <img src={data.icon} alt="logout-icon" />
+      {data.label}
     </Button>
   )
 }

@@ -3,12 +3,12 @@ import { getDurationIntel } from '../../services/utils'
 
 import { Capitalized, Smalltext } from '../../StyleComponents'
 import styled from 'styled-components'
-import { GameObject } from '../../types/typings'
+import { GameLastAction } from '../../types/typings'
 
 interface LastActionsProps {
-  gameData: GameObject
+  lastAction: GameLastAction
 }
-const LastActions: React.FC<LastActionsProps> = ({ gameData }: LastActionsProps) => {
+const LastActions: React.FC<LastActionsProps> = ({ lastAction }: LastActionsProps) => {
   return (
     <LastActionsLine>
       <img
@@ -16,9 +16,9 @@ const LastActions: React.FC<LastActionsProps> = ({ gameData }: LastActionsProps)
         alt="chevrons-right icon"
       />
       <Capitalized>
-        <Smalltext>{gameData.lastActions[0].action}</Smalltext>
+        <Smalltext>{lastAction.action}</Smalltext>
       </Capitalized>
-      <Smalltext>{getDurationIntel(gameData.lastActions[0].timestamp)}</Smalltext>
+      <Smalltext>{getDurationIntel(lastAction.timestamp)}</Smalltext>
     </LastActionsLine>
   )
 }

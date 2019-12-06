@@ -2,9 +2,9 @@ import React from 'react'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 import LoadingSpinner from './LoadingSpinner'
-import { getDurationIntel } from '../services/utils'
-
 import { InlineButton, Truncated, Smalltext } from '../StyleComponents'
+
+import { getDurationIntel } from '../services/utils'
 import { useSession } from '../services/firebase'
 import { GameObject } from '../types/typings'
 
