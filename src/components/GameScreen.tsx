@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import { useParams, useHistory } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import firebase from 'firebase/app'
 import { useDocumentDataOnce, useDocumentData } from 'react-firebase-hooks/firestore'
 
 import LoadingSpinner from './LoadingSpinner'
@@ -16,52 +15,44 @@ import LastActions from './GameScreenComponents/LastActions'
 import PileAndStack from './GameScreenComponents/PileAndStack'
 import ActionBar from './GameScreenComponents/ActionBar'
 import InfoBar from './GameScreenComponents/InfoBar'
+import JackWishModal from './GameScreenComponents/JackWishModal'
 
 import { XXX } from '../StyleComponents'
 import { routePaths } from '../Routes'
 import { useSession } from '../services/firebase'
 import { matchActionTakeSuspension, matchActionDraw, matchActionPut } from '../services/api'
+import {
+  userStatsDocument,
+  gameObjectDocument,
+  deckDataDocument,
+  pileDataDocument,
+} from '../services/firebaseQueries'
 import { GameObject, CardObject, UserStats } from '../types/typings'
-import { userStatsDocument } from '../services/firebaseQueries'
-import JackWishModal from './GameScreenComponents/JackWishModal'
 
 const GameScreen = () => {
-  const user = useSession() as firebase.User
+  const user = useSession()
 
   const { matchId } = useParams()
   const history = useHistory()
 
   // ! fetch & subscribe gameData
-  const [gameData, gameDataLoading] = useDocumentData<GameObject>(
-    firebase
-      .firestore()
-      .collection('games')
-      .doc(matchId)
-  )
+  const [gameData, gameDataLoading] = useDocumentData<GameObject>(gameObjectDocument(matchId || ''))
 
-  const isUserHost = gameData && gameData.guest.id === user.uid ? false : true
+  const isUserHost = gameData && user && gameData.guest.id === user.uid ? false : true
 
   // ! userStats
-  const [userStats, userStatsLoading] = useDocumentDataOnce<UserStats>(userStatsDocument(user.uid))
+  const [userStats, userStatsLoading] = useDocumentDataOnce<UserStats>(
+    userStatsDocument(user?.uid ?? '')
+  )
 
   // ! fetch & subscribe deckData
   const [deckData, deckDataLoading] = useDocumentData<{ deck: CardObject[] }>(
-    firebase
-      .firestore()
-      .collection('games')
-      .doc(matchId)
-      .collection('decks')
-      .doc(user.uid)
+    deckDataDocument(matchId || '', user?.uid ?? '')
   )
 
   // ! fetch & subscribe pileData
   const [pileData, pileDataLoading] = useDocumentData<{ pile: CardObject[] }>(
-    firebase
-      .firestore()
-      .collection('games')
-      .doc(matchId)
-      .collection('decks')
-      .doc('pile')
+    pileDataDocument(matchId || '')
   )
 
   // ! combined loading state
@@ -133,17 +124,17 @@ const GameScreen = () => {
   const [pendingAction, setPendingAction] = useState(false)
 
   async function handleCardAction(card: CardObject, jackWish?: string) {
-    if (gameData && gameData.whichTurn === user.uid && pendingAction === false) {
-      const preCondition = gameData.preCondition
+    if (gameData?.whichTurn === user?.uid && pendingAction === false) {
+      const preCondition = gameData?.preCondition
       if (
-        (preCondition.enabled && preCondition.suspended && card.value !== 'ace') ||
-        (preCondition.enabled && preCondition.toDraw !== 0 && card.value !== '7') ||
-        (preCondition.enabled && preCondition.newColor !== '' && card.value === 'jack')
+        (preCondition?.enabled && preCondition.suspended && card.value !== 'ace') ||
+        (preCondition?.enabled && preCondition.toDraw !== 0 && card.value !== '7') ||
+        (preCondition?.enabled && preCondition.newColor !== '' && card.value === 'jack')
       ) {
         _addNotifWrongCard()
       } else {
         setPendingAction(true)
-        const cardAction = await matchActionPut(gameData.gameId, card, jackWish)
+        const cardAction = await matchActionPut(gameData?.gameId ?? '', card, jackWish)
         if (!cardAction) {
           _addNotifWrongCard()
         }
@@ -161,14 +152,9 @@ const GameScreen = () => {
   // ------------------------------------------------------------
 
   async function handleDrawAction() {
-    if (
-      gameData &&
-      gameData.whichTurn === user.uid &&
-      !gameData.preCondition.suspended &&
-      !pendingAction
-    ) {
+    if (gameData?.whichTurn === user?.uid && !gameData?.preCondition.suspended && !pendingAction) {
       setPendingAction(true)
-      await matchActionDraw(gameData.gameId)
+      await matchActionDraw(gameData?.gameId ?? '')
       setPendingAction(false)
     } else {
       _addNotifNotYourTurn()
@@ -183,10 +169,9 @@ const GameScreen = () => {
 
   async function handleTakeSuspension() {
     if (
-      gameData &&
-      gameData.whichTurn === user.uid &&
-      gameData.preCondition.enabled === true &&
-      gameData.preCondition.suspended === true &&
+      gameData?.whichTurn === user?.uid &&
+      gameData?.preCondition.enabled === true &&
+      gameData?.preCondition.suspended === true &&
       !pendingAction
     ) {
       setPendingAction(true)
@@ -218,7 +203,7 @@ const GameScreen = () => {
           />
           {!gameData.finished ? (
             <Container>
-              <LastActions gameData={gameData} />
+              <LastActions lastAction={gameData.lastActions[0]} />
               <OpponentsRow
                 deckLength={isUserHost ? gameData.guestdeckLength : gameData.hostdeckLength}
               />
@@ -227,10 +212,9 @@ const GameScreen = () => {
               <ActionBar
                 handleDrawAction={handleDrawAction}
                 handleTakeSuspension={handleTakeSuspension}
-                gameData={gameData}
               />
               <DeckRow
-                myTurn={gameData.whichTurn === user.uid}
+                myTurn={gameData.whichTurn === user?.uid}
                 pendingAction={pendingAction}
                 cards={deckData.deck}
                 openModal={openModal}
@@ -241,7 +225,7 @@ const GameScreen = () => {
             <AfterGame
               gameData={gameData}
               opponentId={isUserHost ? gameData.guest.id : gameData.host.id}
-              userId={user.uid}
+              userId={user?.uid ?? ''}
               userStats={userStats}
             />
           )}

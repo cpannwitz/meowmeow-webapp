@@ -38,25 +38,22 @@ const Profile: React.FC = () => {
     }
   }
 
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false)
   const { loading: notificationStateLoading } = useAsync(() =>
     checkPushNotifications().then(result => setNotificationsEnabled(result))
   )
 
-  const [notificationsEnabled, setNotificationsEnabled] = useState(false)
-
-  function handleSubscription() {
+  async function handleSubscription() {
     if (user) {
-      enablePushNotifications()
-        .then(() => setNotificationsEnabled(true))
-        .catch(error => {})
+      await enablePushNotifications()
+      setNotificationsEnabled(true)
     }
   }
 
-  function handleUnsubscription() {
+  async function handleUnsubscription() {
     if (user) {
-      disablePushNotifications()
-        .then(() => setNotificationsEnabled(false))
-        .catch(error => {})
+      await disablePushNotifications()
+      setNotificationsEnabled(false)
     }
   }
 

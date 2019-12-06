@@ -1,22 +1,23 @@
 import React from 'react'
 import styled from 'styled-components'
+import { useCollectionData } from 'react-firebase-hooks/firestore'
+
 import LoadingSpinner from './LoadingSpinner'
 import MatchlistItem from './MatchlistItem'
-
 import { SingleButton } from '../StyleComponents'
+
 import { useToggleState } from '../services/hooks'
-import { useCollectionData } from 'react-firebase-hooks/firestore'
+import { useSession } from '../services/firebase'
 import { openGamesCollection, closedGamesCollection } from '../services/firebaseQueries'
 import { GameObject } from '../types/typings'
-import { useSession } from '../services/firebase'
 
 const Matchlist: React.FC = () => {
   const user = useSession()
   const [openGames, openGamesLoading] = useCollectionData<GameObject>(
-    openGamesCollection(user ? user.uid : '')
+    openGamesCollection(user?.uid ?? '')
   )
   const [closedGames, closedGamesLoading] = useCollectionData<GameObject>(
-    closedGamesCollection(user ? user.uid : '')
+    closedGamesCollection(user?.uid ?? '')
   )
 
   const [showClosedGames, toggleShowClosedGames] = useToggleState(false)

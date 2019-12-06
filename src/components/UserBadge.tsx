@@ -31,13 +31,13 @@ const UserBadge: React.FC = React.memo(() => {
   const history = useHistory()
   const user = useSession()
   const [userStats, userStatsLoading] = useDocumentDataOnce<UserStats>(
-    userStatsDocument(user ? user.uid : '')
+    userStatsDocument(user?.uid || '')
   )
 
   function onClick() {
     history.push(routePaths.profile)
   }
-  if (userStatsLoading) {
+  if (userStatsLoading || !user) {
     return (
       <UserbadgeStyled>
         <LoadingSpinner />
@@ -47,14 +47,14 @@ const UserBadge: React.FC = React.memo(() => {
   return (
     <UserbadgeStyled onClick={onClick}>
       <AvatarWrapSmall>
-        <InnerImage src={user && user.photoURL ? user.photoURL : defaultProfileImage} />
+        <InnerImage src={user.photoURL || defaultProfileImage} />
       </AvatarWrapSmall>
 
-      <SubtitleSmall truncated>{user ? user.displayName : 'unknown'}</SubtitleSmall>
+      <SubtitleSmall truncated>{user.displayName}</SubtitleSmall>
 
-      <UserMP>{userStats ? userStats.meowpoints : 0} MP</UserMP>
+      <UserMP>{userStats?.meowpoints} MP</UserMP>
 
-      <UserRank meowpoints={userStats ? userStats.meowpoints : 0} />
+      <UserRank meowpoints={userStats?.meowpoints ?? 0} />
     </UserbadgeStyled>
   )
 })
